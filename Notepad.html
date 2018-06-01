@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+       body {
+        background-color: black;
+        color: red;
+       }
+    </style> 
+  </head>
+  <body>
+    <table>
+	<tr><td style="font-size: 35px; text-align: center;">Notepad</td></tr>
+	<tr>
+		<td colspan="3">
+			<textarea id="inputTextToSave" style="width: 1300px; height: 500px; border: 2px solid red; background-color: black; color: red; outline: none;">
+</textarea>
+
+		</td>
+	</tr>
+	<tr>
+		<td style="font-size: 20px;">Filename to Save As:</td>
+		<td><input style="background-color: black; border: 2px solid red; color: red; outline: none;" id="inputFileNameToSaveAs"></input></td>
+		<td><button style="background-color: black; border: 2px solid red; color: red; font-size: 20px; outline: none;" onclick="saveTextAsFile()">Save Text to File</button></td>
+	</tr>
+	<tr>
+		<td style="font-size: 20px;">Select a File to Load:</td>
+		<td><input style="font-size: 20px;" type="file" id="fileToLoad">
+		<td><button style="background-color: black; color: red; border: 2px solid red; font-size: 20px; outline: none;" onclick="loadFileAsText()">Load Selected File</button><td>
+	</tr>
+</table>
+<script>
+function saveTextAsFile()
+{
+	var textToWrite = document.getElementById("inputTextToSave").value;
+	var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+	var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
+
+	var downloadLink = document.createElement("a");
+	downloadLink.download = fileNameToSaveAs;
+	downloadLink.innerHTML = "Download File";
+	if (window.webkitURL != null)
+	{
+		// Chrome allows the link to be clicked
+		// without actually adding it to the DOM.
+		downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+	}
+	else
+	{
+		// Firefox requires the link to be added to the DOM
+		// before it can be clicked.
+		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		downloadLink.onclick = destroyClickedElement;
+		downloadLink.style.display = "none";
+		document.body.appendChild(downloadLink);
+	}
+
+	downloadLink.click();
+}
+
+function destroyClickedElement(event)
+{
+	document.body.removeChild(event.target);
+}
+
+function loadFileAsText()
+{
+	var fileToLoad = document.getElementById("fileToLoad").files[0];
+
+	var fileReader = new FileReader();
+	fileReader.onload = function(fileLoadedEvent) 
+	{
+		var textFromFileLoaded = fileLoadedEvent.target.result;
+		document.getElementById("inputTextToSave").value = textFromFileLoaded;
+	};
+	fileReader.readAsText(fileToLoad, "UTF-8");
+}
+</script>
+      </body>
+</html>
